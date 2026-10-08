@@ -18,6 +18,7 @@ Per il laboratorio locale visita `/signin-with-chatgpt?return_to=/`: l’identit
 ```sh
 npm run build
 npx wrangler d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_lovely_living_lightning.sql
+npx wrangler d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0001_smiling_stingray.sql
 ```
 
 Il file `.env.example` mostra le variabili facoltative del mittente e dell’AI. La chiave OpenAI deve restare un segreto del server; nel sito attuale l’AI è ancora da collegare. Le password e i file `.env` non fanno parte del repository. La pubblicazione attuale è gestita da Sites e resta privata; il manifest `.openai/hosting.json` collega questo progetto alla sua pubblicazione esistente. Un clone non viene pubblicato automaticamente. Per un nuovo hosting servono un proprio database D1 e un’autenticazione verificata sul server.
@@ -31,7 +32,17 @@ npm run lint
 npm run build
 ```
 
-I test usano fixture locali per analisi, prototipi, coda, geometria e percorsi. GitHub Actions esegue test, TypeScript, lint e build su Node 24. Le verifiche browser sono descritte in `docs/verification-v7.md`, `docs/verification-v8.md` e `docs/verification-v9.md`.
+I test usano fixture locali per analisi, prototipi, coda, geometria e percorsi. GitHub Actions esegue test, TypeScript, lint e build su Node 24. Le verifiche browser sono descritte in `docs/verification-v7.md`, `docs/verification-v8.md`, `docs/verification-v9.md` e `docs/verification-v10.md`.
+
+## Navigazione e strumenti della versione 10
+
+La selezione di un’azienda mantiene la vista Mappa. Il comando «3D» torna alla prospettiva nella zona corrente. I movimenti guidati cancellano l’inerzia del trascinamento; la vista della squadra normalizza il punto di arrivo, così la transizione può terminare. In vista strada, rotella e pulsanti + / − cambiano il campo visivo senza spostare la camera. Nelle viste dall’alto, il centro della camera resta entro l’area coperta dal catalogo e la sua altezza rispetta un limite calcolato dagli edifici renderizzati, con cortili esclusi. È una protezione approssimata: le facciate e alcuni monumenti non sono una simulazione fisica completa.
+
+La qualità Auto sceglie inizialmente la modalità leggera su schermi piccoli e riduce la qualità dopo ripetuti frame lenti misurati durante il rendering. Puoi scegliere Leggera (meno dettagli, ombre disattivate, risoluzione ridotta) oppure Alta. La scelta è una preferenza del dispositivo; il cambio mantiene città e camera. «Guida ai comandi» spiega mouse, WASD, zoom e recupero della visuale. Il catalogo diventa cliccabile appena i suoi dati sono pronti, senza aspettare tutta la geometria. I movimenti da tastiera si fermano nelle finestre di dialogo e quando la pagina perde il focus.
+
+Le stelle salvano fino a 200 aziende preferite nel database del tuo account, riunendo i diversi cataloghi nella scheda Preferite. Il salvataggio viene confermato dopo la risposta del server; errori di lettura e scrittura offrono un nuovo tentativo. La migrazione `0001` aggiunge soltanto la tabella delle preferite; le missioni esistenti restano nell’archivio.
+
+Le missioni possono essere cercate per azienda, categoria o indirizzo e filtrate per verifica, demo pronte o analisi senza prototipi. Riselezionare un’azienda riapre la sua analisi disponibile. Ricerca e recupero operano sulle ultime 30 missioni caricate dall’archivio e sui risultati della sessione corrente; non sono una ricerca di tutto lo storico remoto.
 
 ## Analisi, AI e verifiche della versione 9
 

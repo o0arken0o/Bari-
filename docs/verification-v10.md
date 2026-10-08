@@ -1,0 +1,31 @@
+# Verifica della versione 10 · 8 ottobre 2026
+
+La richiesta riguarda uso quotidiano, zoom e funzioni aggiuntive. La versione pubblicata precedente è stata aperta in Chromium, utilizzando soltanto il token di accesso previsto da Sites per la stessa origine. Sono stati provati zoom ripetuto, spostamento, ricerca di Kibari, selezione e apertura delle missioni. La città ha caricato 6.990 volumi renderizzati e 1.312 percorsi locali senza errori JavaScript nelle azioni eseguite. Il test iniziale non ha riprodotto un crash generale dello zoom; le correzioni aggiungono protezioni e risolvono cambi di vista e perdite di contesto verificabili.
+
+Il token di servizio consente l’accesso privato ma non rappresenta l’identità del proprietario per le API. Missioni e preferite sono quindi state provate con il database D1 locale e il percorso legittimo `/signin-with-chatgpt`, senza falsificare identità o header. Le sessioni locali condividono l’identità di prova; le righe di un proprietario diverso sono fixture reversibili. Nessuna azienda è stata contattata nelle verifiche locali e nessuna email è stata inviata.
+
+## Risultati
+
+- 54 test automatici superati, inclusi 6 nuovi casi per limiti dello spostamento, visuale invariata entro i limiti, tetti/cortili, volumi sovrapposti, arresto dell’inerzia con OrbitControls reale e destinazione della vista squadra.
+- 22 controlli dell’API reale delle preferite superati: accesso, formato, ID di catalogo, salvataggio idempotente, ricaricamento in una seconda sessione, cancellazione, isolamento per proprietario e limite atomico. Partendo da 198 preferite, cinque richieste simultanee hanno prodotto due salvataggi e tre risposte 409, con 200 righe finali. Le fixture locali sono state rimosse; una lettura separata del database ha confermato zero righe residue nella tabella delle preferite.
+- 29 controlli delle nuove funzioni dell’interfaccia superati con risposte API simulate: preferenza grafica dopo reload, guida/Esc/focus, errore di salvataggio senza falsa conferma, nuovo tentativo, preferite tra cataloghi, ricaricamento, riapertura dell’analisi, ricerca e filtri missioni, recupero dagli errori e rimozione delle stelle. Schermi 390×700 e 844×390: nessun overflow orizzontale, chiusura del catalogo raggiungibile, qualità e guida disponibili dopo la chiusura dei pannelli.
+- 26 controlli del laboratorio e delle anteprime superati: quattro selezioni, due richieste simultanee, coda, retry selettivo, conservazione della selezione, verifiche browser dei prototipi, rapporto AI inattiva, pagine con fonti, anteprima bilingue e modulo locale, sandbox, Esc, focus e finestre su 390×844 e 844×390.
+- 69 controlli dell’API reale delle missioni superati con D1 locale: quota atomica, autenticazione, input, isolamento dei rapporti, artefatti e CSP, verifiche effettive dei prototipi nel browser, correzione del layout, revisioni obsolete rifiutate e recupero delle vecchie missioni. I siti aziendali sono sostituiti da fixture e l’AI resta non configurata.
+- 12 controlli dell’archivio superati: caricamento iniziale, 401, 503, errore di rete, JSON non valido, recupero e ritorno alla città.
+
+- Scena 3D completa, senza sostituire la geometria: 15 clic di zoom avanti e 25 indietro, altezza sopra i tetti renderizzati, coordinate finite, limite della distanza, mantenimento della Mappa durante la selezione, rotella e trascinamento in strada, dialogo che interrompe la camminata, cambio Alta/Leggera con un solo canvas, resize e recupero dopo perdita del contesto grafico. Nessun errore JavaScript nelle azioni provate.
+- 8 prove mirate nella scena reale dopo le correzioni: zoom avanti e indietro in strada senza spostare la camera, camminata ad altezza fissa, ritorno esatto al centro dopo trascinamento, vista squadra che termina la transizione, selezione di Kibari senza perdere la Mappa, ritorno esplicito in 3D e assenza di errori JavaScript.
+- 6 dimensioni per la raggiungibilità di tutti i comandi di esplorazione: 640×480, 390×480, 320×480, 390×390, 844×390 e 390×700. Le prove controllano l’elemento effettivamente presente sotto il centro di ciascun pulsante, oltre ai suoi limiti nello schermo. I nuovi comandi avevano coperto lo zoom a 640×480 e la bussola a 844×390: la disposizione è stata corretta e tutte le prove ripetute sono passate.
+- TypeScript ed ESLint completati senza errori o avvisi. Il build è eseguito dal workflow Sites prima della pubblicazione e da GitHub Actions.
+
+Le prime prove della scena usavano alcune attese temporali fisse: zoom, camminata e ritorno al centro sono stati ripetuti aspettando lo stato effettivo della camera. Una camminata dopo una rotazione può inoltre essere fermata correttamente dai controlli del mare o degli edifici; la prova mirata parte dalla direzione pedonale iniziale. Il ritorno al centro cancella l’inerzia residua di OrbitControls. La vista squadra aveva un punto di mira elevato mentre l’aggiornamento della camera lo riportava a terra: normalizzare la destinazione evita una transizione continuamente attiva. Entrambi i comportamenti sono verificati anche con test automatici e con la scena reale.
+
+## Limiti
+
+Il rendering 3D è provato con Chromium e SwiftShader, che usa la CPU. Non misura la fluidità su una GPU reale né copre ogni dispositivo. La qualità Leggera riduce dettagli, ombre e risoluzione; Auto usa il costo misurato delle chiamate di rendering e non una certificazione della GPU.
+
+La protezione sopra gli edifici usa sagome pubbliche, altezze renderizzate e un margine; conserva i cortili. È una protezione approssimata per la camera dall’alto, non una simulazione completa di facciate, monumenti e arredi. La vista strada conserva i controlli di movimento approssimati esistenti.
+
+La ricerca delle missioni e la riapertura per azienda operano sulle ultime 30 missioni caricate e sui risultati della sessione; non interrogano tutto lo storico remoto. Preferite e missioni sono salvate per proprietario; la qualità grafica è una preferenza del dispositivo. La migrazione generata `0001` aggiunge solo la tabella delle preferite, senza modificare la migrazione `0000` o spostare i rapporti.
+
+L’AI rimane esplicitamente inattiva senza chiave server. I prototipi sono demo da verificare, i bisogni aziendali non sono carenze accertate e nessun messaggio commerciale viene inviato automaticamente.

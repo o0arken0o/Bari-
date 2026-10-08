@@ -43,7 +43,7 @@ function roofTexture(terracotta:boolean){
 export async function createArchitecture(records:Footprint[],stoneTexture:THREE.Texture,signal?:AbortSignal,plasterTexture?:THREE.Texture){
  const group=new THREE.Group(),walls=pal.map(surface),distantWalls=pal.map(surface),roofs=pal.map(surface);const generatedPlaster=plasterTexture?null:facadeTexture(false),plaster=plasterTexture||generatedPlaster!,distantFacade=facadeTexture(true),flatRoof=roofTexture(false),tiledRoof=roofTexture(true);
  const chunks=new Map<string,{x:number;z:number;fallbackWalls:Surface;fallbackColors:number[];windows:Surface;warmWindows:Surface;frames:Surface;ledges:Surface;rails:Surface;roofEquipment:Surface;doors:Surface;shutters:Surface;awnings:Surface}>();
- const centers:{x:number;z:number;height:number}[]=[];
+ const centers:{id:string;x:number;z:number;height:number}[]=[];
  let footprintCount=0,windowCount=0;
  const ordered=[...records].sort((a,b)=>{const p=a.geometry[0],q=b.geometry[0];return (p.lat-41.1275)**2+(p.lon-16.874)**2-((q.lat-41.1275)**2+(q.lon-16.874)**2);});
  let lastYield=performance.now();
@@ -61,7 +61,7 @@ export async function createArchitecture(records:Footprint[],stoneTexture:THREE.
   const levels=Number.isFinite(rawLevels)?Math.max(1,Math.min(rawLevels,18)):oldTown?2+seed%3:4+seed%4;
   const height=Math.max(.12,Math.min((Number.isFinite(rawHeight)?rawHeight:levels*3.15)/25,4.3));const bucket=seed%pal.length;
   const detail=center.distanceTo(world(41.1281,16.872))<19;const base=.006,top=base+height;
-  const holes=(record.holes||[]).map(r=>{const p=r.map(p=>world(p.lat,p.lon));if(p.length>2&&p[0].distanceToSquared(p[p.length-1])<.00001)p.pop();if(!THREE.ShapeUtils.isClockWise(p.map(q=>new THREE.Vector2(q.x,q.z))))p.reverse();return p;}).filter(p=>p.length>=3);const allPoints=points.concat(...holes);const indices=THREE.ShapeUtils.triangulateShape(contour,holes.map(r=>r.map(p=>new THREE.Vector2(p.x,p.z))));if(!indices.length)continue;centers.push({x:center.x,z:center.z,height:top});
+  const holes=(record.holes||[]).map(r=>{const p=r.map(p=>world(p.lat,p.lon));if(p.length>2&&p[0].distanceToSquared(p[p.length-1])<.00001)p.pop();if(!THREE.ShapeUtils.isClockWise(p.map(q=>new THREE.Vector2(q.x,q.z))))p.reverse();return p;}).filter(p=>p.length>=3);const allPoints=points.concat(...holes);const indices=THREE.ShapeUtils.triangulateShape(contour,holes.map(r=>r.map(p=>new THREE.Vector2(p.x,p.z))));if(!indices.length)continue;centers.push({id:String(record.id),x:center.x,z:center.z,height:top});
   const pitched=detail&&oldTown&&seed%5===0&&points.length===4&&!holes.length&&area<2;
   if(pitched){const ridge=new THREE.Vector3(center.x,top+.08,center.z);for(let i=0;i<points.length;i++)triangle(roofs[bucket],points[i].clone().setY(top),ridge,points[(i+1)%points.length].clone().setY(top));}else for(const ids of indices){const p=ids.map(i=>new THREE.Vector3(allPoints[i].x,top,allPoints[i].z));triangle(roofs[bucket],p[0],p[2],p[1]);}
   const rings=[points,...holes];for(let ringIndex=0;ringIndex<rings.length;ringIndex++){const ring=rings[ringIndex];
