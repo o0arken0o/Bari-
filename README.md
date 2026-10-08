@@ -11,7 +11,7 @@ npm run install:ci
 npm run dev
 ```
 
-Apri http://127.0.0.1:5173. Trascina per spostare la camera, usa il tasto destro per ruotarla e la rotella per lo zoom. «Squadra» avvicina la camera agli agenti; «Vista strada» abilita mouse e WASD/frecce. Puoi cercare un’attività, avviare l’analisi, approvare una demo e scaricare HTML e proposta.
+Apri http://127.0.0.1:5173. Trascina per spostare la camera, usa il tasto destro per ruotarla e la rotella per lo zoom. «Squadra» avvicina la camera agli agenti; «Vista strada» abilita mouse e WASD/frecce. Nella sezione Aziende seleziona fino a quattro attività, scegli 1, 2 o 4 aziende in parallelo e premi «Attiva agenti». Analisi, prototipi e verifica partono insieme; apri le anteprime e scarica i singoli HTML dalle missioni salvate.
 
 Per il laboratorio locale visita `/signin-with-chatgpt?return_to=/`: l’identità di prova è condivisa da tutte le sessioni locali e non sostituisce l’autenticazione di produzione. Per creare l’archivio locale, dopo il primo build:
 
@@ -31,7 +31,15 @@ npm run lint
 npm run build
 ```
 
-I test usano fixture locali per analisi, documenti generati, geometria e percorsi. GitHub Actions esegue test, TypeScript, lint e build su Node 24. Le verifiche browser della versione 7 sono descritte in `docs/verification-v7.md`.
+I test usano fixture locali per analisi, prototipi, coda, geometria e percorsi. GitHub Actions esegue test, TypeScript, lint e build su Node 24. Le verifiche browser sono descritte in `docs/verification-v7.md` e `docs/verification-v8.md`.
+
+## Prototipi automatici della versione 8
+
+Un sito non indicato nella fonte genera un sito vetrina da valutare, senza affermare che il sito aziendale sia assente. Una pagina iniziale accessibile può generare più prototipi: richiesta soggiorno/tavolo/preventivo, accoglienza italiano/inglese e informazioni/contatti. Gli indizi «da confermare» non generano carenze inventate. Se tutte le funzioni sono presenti, o il sito non è accessibile, viene salvata un’analisi senza prototipi.
+
+Il generatore usa regole e modelli HTML specifici; non è un servizio di agenti LLM. Le demo non inventano recapiti, prezzi, fotografie, servizi o recensioni. Le richieste sono locali, senza trasmissione o salvataggio. Ogni documento HTML viene conservato nel rapporto della missione; l’archivio restituisce soltanto i descrittori, mentre download e anteprima verificano il proprietario. Gli HTML sono piccoli documenti testuali, senza asset caricati separatamente o nuove migrazioni.
+
+La coda lavora nella pagina aperta, con massimo quattro nuove analisi al minuto e fino a quattro aziende in parallelo. Un errore lascia disponibili i risultati delle altre aziende e consente di riprovare solo quelle fallite. I risultati già salvati persistono nel database. Le vecchie missioni in revisione mantengono il flusso di approvazione e i vecchi download. I bisogni, il prodotto operativo e l’offerta commerciale richiedono ancora verifica prima della vendita; nessuna email viene inviata.
 
 ## Correzioni e grafica della versione 7
 
@@ -39,7 +47,7 @@ Materiale di intonaco originale, facciate con dettagli o texture in base alla di
 
 Le analisi parziali mantengono l’incertezza sulle funzioni non individuate. Commenti e script non vengono usati come prova di un servizio. Il limite delle quattro nuove missioni al minuto è atomico anche con richieste simultanee; il backend rifiuta richieste malformate e protegge l’archivio per proprietario. La demo bilingue traduce tutti i testi visibili.
 
-Owner-private navigable prototype of Bari. Three.js camera pan/orbit/zoom, searchable real public business records, source-linked preliminary public audits, owner approval, generated local HTML demos and D1 mission history.
+Owner-private navigable prototype of Bari. Three.js camera pan/orbit/zoom, searchable real public business records, source-linked preliminary public audits, automatic targeted local HTML prototypes and D1 mission history. Legacy review missions retain owner approval.
 
 Data snapshot 2026-10-07: 3,123 deduplicated named OSM commercial candidates (not a census), 886 ARET hospitality registrations and 3,770 ARET tourist rentals. Source catalogs remain separate and can overlap. Missing/suspicious shared coordinates are omitted from positioning. No Airbnb affiliation inferred.
 

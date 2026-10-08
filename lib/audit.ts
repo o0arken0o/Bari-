@@ -1,6 +1,8 @@
 export type Business={id:string;name:string;category:string;lat:number|null;lon:number|null;address:string;website:string;source:string;sourceUrl:string;sourceDate:string;type:string;openingHours?:string;cin?:string;locationNote?:string};
 export type Finding={title:string;state:'presente'|'non rilevato'|'da confermare';detail:string;url:string};
-export type Report={business:Business;findings:Finding[];fetched:boolean;checkedAt:string;note:string;proposal:{title:string;description:string;kind?:string;trigger?:string};qa?:{title:string;passed:boolean}[]};
+export type PrototypeKind='website'|'request'|'bilingual'|'contacts';
+export type Prototype={id:PrototypeKind;kind:PrototypeKind;title:string;reason:string;needsConfirmation:boolean;qa:{title:string;passed:boolean}[];html?:string};
+export type Report={business:Business;findings:Finding[];fetched:boolean;checkedAt:string;note:string;proposal:{title:string;description:string;kind?:string;trigger?:string};qa?:{title:string;passed:boolean}[];prototypes?:Prototype[]};
 export function publicUrl(raw:string){try{const u=new URL(raw);if(!['https:','http:'].includes(u.protocol)||u.username||u.password||u.port||!u.hostname.includes('.')||/^[\d.]+$/.test(u.hostname)||u.hostname.includes(':')||/(^|\.)(localhost|local|internal|test|invalid|arpa)$/.test(u.hostname))return null;return u;}catch{return null;}}
 async function boundedPage(raw:string){
  let u=publicUrl(raw);if(!u)throw new Error('Indirizzo non utilizzabile');
