@@ -20,7 +20,7 @@ npm run build
 npx wrangler d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_lovely_living_lightning.sql
 ```
 
-Il file `.env.example` mostra la variabile facoltativa del mittente. Le password e i file `.env` non fanno parte del repository. La pubblicazione attuale è gestita da Sites e resta privata; il manifest `.openai/hosting.json` collega questo progetto alla sua pubblicazione esistente. Un clone non viene pubblicato automaticamente. Per un nuovo hosting servono un proprio database D1 e un’autenticazione verificata sul server.
+Il file `.env.example` mostra le variabili facoltative del mittente e dell’AI. La chiave OpenAI deve restare un segreto del server; nel sito attuale l’AI è ancora da collegare. Le password e i file `.env` non fanno parte del repository. La pubblicazione attuale è gestita da Sites e resta privata; il manifest `.openai/hosting.json` collega questo progetto alla sua pubblicazione esistente. Un clone non viene pubblicato automaticamente. Per un nuovo hosting servono un proprio database D1 e un’autenticazione verificata sul server.
 
 ## Verifiche
 
@@ -31,13 +31,23 @@ npm run lint
 npm run build
 ```
 
-I test usano fixture locali per analisi, prototipi, coda, geometria e percorsi. GitHub Actions esegue test, TypeScript, lint e build su Node 24. Le verifiche browser sono descritte in `docs/verification-v7.md` e `docs/verification-v8.md`.
+I test usano fixture locali per analisi, prototipi, coda, geometria e percorsi. GitHub Actions esegue test, TypeScript, lint e build su Node 24. Le verifiche browser sono descritte in `docs/verification-v7.md`, `docs/verification-v8.md` e `docs/verification-v9.md`.
+
+## Analisi, AI e verifiche della versione 9
+
+L’analisi legge fino a sei pagine pertinenti dello stesso sito (contatti, servizi, prenotazioni e lingue), entro limiti di tempo e dimensione. Il rapporto mostra pagine, indizi ed estratti collegati alle fonti. Letture fallite o parziali mantengono l’incertezza sulle funzioni non trovate: il campione non è una scansione interna dell’azienda.
+
+Il collegamento server a OpenAI Responses può trasformare le opportunità già selezionate in brief per Ada e testi IT/EN specifici, citando soltanto le fonti raccolte. Le proposte non aggiungono servizi aziendali, prezzi o recapiti. Senza chiave, oppure in caso di risposta non valida, il rapporto indica lo stato e usa i modelli disponibili. Il sito pubblicato non ha ancora una chiave OpenAI: la connessione reale è da attivare, mentre il protocollo è verificato con fixture. Le funzioni operative dei prodotti rimangono quelle dei modelli HTML; il brief non crea liberamente nuovi software.
+
+Luca esegue prove dei prototipi nel browser dell’utente a 390 e 1280 pixel: layout, etichette, email non valide, richiesta locale, ripristino e collegamenti; per hotel controlla le date e per le demo bilingue i testi IT/EN. Il rapporto salva l’esito per ogni demo. Anteprima normale, download e proposta commerciale diventano disponibili solo dopo tutti i controlli. Un errore di layout può ricevere una correzione e una nuova verifica; un errore funzionale resta da rivedere. Se la pagina viene chiusa, i prototipi salvati possono essere verificati nuovamente dalla missione.
+
+Le prove vengono eseguite nel browser del proprietario e l’API ne valida formato, proprietà e revisione del documento. Non sono un’attestazione indipendente di un servizio di test remoto. Le nuove missioni mantengono il limite di quattro analisi al minuto e la coda richiede la pagina aperta. Nessuna email viene inviata.
 
 ## Prototipi automatici della versione 8
 
-Un sito non indicato nella fonte genera un sito vetrina da valutare, senza affermare che il sito aziendale sia assente. Una pagina iniziale accessibile può generare più prototipi: richiesta soggiorno/tavolo/preventivo, accoglienza italiano/inglese e informazioni/contatti. Gli indizi «da confermare» non generano carenze inventate. Se tutte le funzioni sono presenti, o il sito non è accessibile, viene salvata un’analisi senza prototipi.
+Un sito non indicato nella fonte genera un sito vetrina da valutare, senza affermare che il sito aziendale sia assente. Un campione accessibile di pagine pertinenti può generare più prototipi: richiesta soggiorno/tavolo/preventivo, accoglienza italiano/inglese e informazioni/contatti. Gli indizi «da confermare» non generano carenze inventate. Se tutte le funzioni sono presenti, o il sito non è accessibile, viene salvata un’analisi senza prototipi.
 
-Il generatore usa regole e modelli HTML specifici; non è un servizio di agenti LLM. Le demo non inventano recapiti, prezzi, fotografie, servizi o recensioni. Le richieste sono locali, senza trasmissione o salvataggio. Ogni documento HTML viene conservato nel rapporto della missione; l’archivio restituisce soltanto i descrittori, mentre download e anteprima verificano il proprietario. Gli HTML sono piccoli documenti testuali, senza asset caricati separatamente o nuove migrazioni.
+Il generatore usa regole e modelli HTML specifici. La versione 9 aggiunge un collegamento facoltativo a OpenAI per brief e testi personalizzati, esplicitamente inattivo fino alla configurazione della chiave sul server. Le demo non inventano recapiti, prezzi, fotografie, servizi o recensioni. Le richieste sono locali, senza trasmissione o salvataggio. Ogni documento HTML viene conservato nel rapporto della missione; l’archivio restituisce soltanto i descrittori, mentre download e anteprima verificano il proprietario. Gli HTML sono piccoli documenti testuali, senza asset caricati separatamente o nuove migrazioni.
 
 La coda lavora nella pagina aperta, con massimo quattro nuove analisi al minuto e fino a quattro aziende in parallelo. Un errore lascia disponibili i risultati delle altre aziende e consente di riprovare solo quelle fallite. I risultati già salvati persistono nel database. Le vecchie missioni in revisione mantengono il flusso di approvazione e i vecchi download. I bisogni, il prodotto operativo e l’offerta commerciale richiedono ancora verifica prima della vendita; nessuna email viene inviata.
 
@@ -53,7 +63,7 @@ Data snapshot 2026-10-07: 3,123 deduplicated named OSM commercial candidates (no
 
 OpenStreetMap data and derived database: © OpenStreetMap contributors, ODbL 1.0, https://www.openstreetmap.org/copyright . ARET Pugliapromozione / Regione Puglia records: CC BY 4.0, https://dati.puglia.it/v2/dataset/puglia-elenco-delle-strutture-ricettive-e-delle-locazioni-turistiche-progressivo . Source URLs and timestamps travel with records. Public exports available at /data/businesses.json and /data/geography.json. Application source is separate from these licensed datasets.
 
-Agent avatars are prototype workflow roles. Public-page keyword rules provide limited evidence, not comprehensive AI analysis or confirmed company needs. Website scans are allowlisted to catalog URLs with public URL validation, bounded redirects, size/time limits, and four user-triggered missions per minute. No messages are sent to businesses. Demos do not transmit form data or represent finished products. QA checks are basic structural checks. No guaranteed revenue.
+Agent avatars are prototype workflow roles. Public-page keyword rules provide limited evidence, not comprehensive AI analysis or confirmed company needs. Website scans are allowlisted to catalog URLs with public URL validation, bounded redirects, size/time limits, and four user-triggered missions per minute. No messages are sent to businesses. Demos do not transmit form data or represent finished products. New prototypes require structural checks and functional browser checks before downloads are enabled; legacy demos retain their original checks. No guaranteed revenue.
 
 Run npm run dev. Optional local ChatGPT identity at /signin-with-chatgpt?return_to=/. D1 binding DB; apply generated drizzle migration locally per starter workflow after build. Production auth and private access are platform-owned. Missions are scoped by stable authenticated user ID.
 
@@ -67,7 +77,7 @@ Materials include an original generated limestone texture and the Three.js water
 
 A second OSM snapshot adds 2,125 local ways in the central core (source timestamp 2026-10-07T13:47:51Z, fetched 13:49:26Z), with provenance in public/data/local-streets.json. Underground/covered/indoor/area ways and crossings are excluded from the rendered surface layer. Reconstructed doors, shutters, awnings, landmark geometry, benches and lamps are not a surveyed model. Street view starts on the reconstructed pavement beside the published Lungomare coastline; WASD moves the camera with the basic collision checks described in version 6. Day/sunset/night update sunlight, sea and a subset of window/lamp emission. Shared instanced geometry animates a limited crowd and traffic along public ways. Agent avatars follow road routes where connected and remain role visualizations.
 
-Completed missions derive an email draft and downloadable commercial brief from the existing report. Missing homepage evidence is never described as a confirmed company need. QA must pass before a new mission is completed. SALES_SENDER_EMAIL configures the intended sender through Sites runtime; it is not an email credential. Recipient verification, operational product development, pricing and a sending integration are still required. No email is sent, and a Gmail plugin in chat does not create an unattended Site mail service.
+Completed missions derive an email draft and downloadable commercial brief from the existing report. Missing evidence in sampled pages is never described as a confirmed company need. QA must pass before a new mission is completed. SALES_SENDER_EMAIL configures the intended sender through Sites runtime; it is not an email credential. Recipient verification, operational product development, pricing and a sending integration are still required. No email is sent, and a Gmail plugin in chat does not create an unattended Site mail service.
 
 ## Map-inspired graphics (version 4)
 

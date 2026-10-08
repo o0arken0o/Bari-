@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {registerHooks} from 'node:module';
 const url=new URL('../lib/prototypes.ts',import.meta.url).href;
-registerHooks({resolve(specifier,context,nextResolve){if(specifier==='./audit'&&context.parentURL===url)return nextResolve('./audit.ts',context);return nextResolve(specifier,context);}});
+registerHooks({resolve(specifier,context,nextResolve){if(specifier==='./audit'&&context.parentURL===url)return nextResolve('./audit.ts',context);if(specifier==='./verification'&&context.parentURL===url)return nextResolve('./verification.ts',context);return nextResolve(specifier,context);}});
 const {planPrototypes,buildPrototypes,publicReport,prototypeHtml}=await import(url);
 const {companyQueue}=await import('../lib/company-queue.ts');
 const business={id:'fixture',name:'Attività campione',category:'Hotel',lat:41.12,lon:16.87,address:'Via campione, Bari',website:'https://example.com/',source:'fixture',sourceUrl:'https://example.com/source',sourceDate:'2026-10-08',type:'hotel'};

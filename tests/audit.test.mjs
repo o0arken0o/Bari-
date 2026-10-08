@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {auditBusiness, demoHtml, publicUrl} from '../lib/audit.ts';
+import {auditBusiness, demoHtml, publicUrl, relevantLinks} from '../lib/audit.ts';
 import {commercialDraft} from '../lib/commercial.ts';
 
 const business={id:'fixture',name:'Attività campione',category:'Hotel',lat:41.12,lon:16.87,address:'Bari',website:'https://example.com/',source:'fixture',sourceUrl:'https://example.com/source',sourceDate:'2026-10-08',type:'hotel'};
@@ -81,4 +81,26 @@ test('generated demo escapes company text and links and declares its local behav
 test('public website validation blocks direct local addresses and credentials',()=>{
  for(const value of ['http://localhost/','http://127.0.0.1/','http://[::1]/','https://private.internal/','https://user:password@example.com/','javascript:alert(1)'])assert.equal(publicUrl(value),null);
  assert.equal(publicUrl('https://example.com/').href,'https://example.com/');
+});
+
+
+test('internal service pages supply evidence with the actual page URL',async()=>{
+ const oldFetch=globalThis.fetch;const seen=[];globalThis.fetch=async url=>{seen.push(String(url));return htmlResponse(String(url).includes('/servizi')?'<html lang="it"><body><a href="mailto:hello@example.com">Contatti</a><p>Prenota una camera</p></body></html>':'<html lang="it"><body><a href="/servizi">Servizi</a></body></html>');};
+ try{const report=await auditBusiness(business);assert.equal(seen.length,2);assert.equal(report.findings[2].state,'presente');assert.equal(report.findings[4].state,'presente');assert.equal(report.findings[2].url,'https://example.com/servizi');assert.equal(report.crawl.pages.length,2);assert.match(report.findings[2].evidence[0].excerpt,/Prenota/);}finally{globalThis.fetch=oldFetch;}
+});
+test('an inaccessible linked page preserves uncertainty for missing features',async()=>{
+ const oldFetch=globalThis.fetch;globalThis.fetch=async url=>{if(String(url).includes('/contatti'))throw Error('Fixture');return htmlResponse('<html><body><a href="/contatti">Contatti</a></body></html>');};
+ try{const report=await auditBusiness(business);assert.equal(report.crawl.coverage,'partial');assert.equal(report.findings[2].state,'da confermare');assert.equal(report.findings[4].state,'presente');assert.equal(report.crawl.pages[1].state,'failed');}finally{globalThis.fetch=oldFetch;}
+});
+test('crawler only selects relevant same-origin public pages and excludes account actions',()=>{
+ const html='<a href="/servizi">Servizi</a><a href="https://other.example/contatti">Contatti</a><a href="javascript:alert(1)">Prenota</a><a href="/logout">Contatti</a><a href="/contact?delete=1">Contatti</a><a href="/en?lang=en">English</a><a href="/menu.pdf">Menu</a><!-- <a href="/fake-contact">Contatti</a> -->';
+ assert.deepEqual(relevantLinks(html,'https://example.com/').sort(),['https://example.com/en?lang=en','https://example.com/servizi']);
+});
+test('crawl is bounded at six pages even when each page supplies more links',async()=>{
+ const oldFetch=globalThis.fetch;let reads=0;globalThis.fetch=async()=>{reads++;return htmlResponse('<html lang="it"><body>'+Array.from({length:20},(_,i)=>'<a href="/servizi/'+i+'">Servizi '+i+'</a>').join('')+'</body></html>');};
+ try{const report=await auditBusiness(business);assert.equal(reads,6);assert.equal(report.crawl.pages.length,6);assert.equal(report.crawl.coverage,'sampled');assert.equal(new Set(report.crawl.pages.map(p=>p.url)).size,6);}finally{globalThis.fetch=oldFetch;}
+});
+test('internal redirects cannot escape to another website',async()=>{
+ const oldFetch=globalThis.fetch;const seen=[];globalThis.fetch=async url=>{seen.push(String(url));return String(url).endsWith('/servizi')?new Response(null,{status:302,headers:{location:'https://other.example/servizi'}}):htmlResponse('<a href="/servizi">Servizi</a>');};
+ try{const report=await auditBusiness(business);assert.ok(!seen.some(url=>url.includes('other.example')));assert.equal(report.crawl.coverage,'partial');}finally{globalThis.fetch=oldFetch;}
 });
