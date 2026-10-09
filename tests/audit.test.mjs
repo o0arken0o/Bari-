@@ -81,6 +81,9 @@ test('generated demo escapes company text and links and declares its local behav
 test('public website validation blocks direct local addresses and credentials',()=>{
  for(const value of ['http://localhost/','http://127.0.0.1/','http://[::1]/','https://private.internal/','https://user:password@example.com/','javascript:alert(1)'])assert.equal(publicUrl(value),null);
  assert.equal(publicUrl('https://example.com/').href,'https://example.com/');
+ for(const value of ['http://0x7f.1/','http://2130706433/','https://nas.lan/','https://site.home/','https://abc.123/','http://192.168.1.10/'])assert.equal(publicUrl(value),null,value);
+ assert.equal(publicUrl('https://www.hotel-bari.it/it').hostname,'www.hotel-bari.it');
+ assert.ok(publicUrl('https://xn--80aswg.xn--p1ai/'));
 });
 
 

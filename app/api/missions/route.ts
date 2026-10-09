@@ -54,6 +54,8 @@ export async function POST(request:Request){
    return Response.json({id:row.id,status:completed?'completed':'review',report:publicReport(report),commercial:completed&&hasPrototype(report)?commercialDraft(report,sender()):undefined},{headers:{'Cache-Control':'no-store'}});
   }
   const business=catalog.find(b=>b.id===value);if(!business)return Response.json({error:'Attività non trovata nel catalogo'},{status:400});
+  // Reservations left behind by an interrupted worker would otherwise stay in the archive forever.
+  await db.prepare("DELETE FROM missions WHERE owner=? AND status='pending' AND created_at<?").bind(user.userId,new Date(Date.now()-600000).toISOString()).run();
   const id=crypto.randomUUID();const createdAt=new Date().toISOString();const minuteAgo=new Date(Date.now()-60000).toISOString();
   // A single SQLite statement reserves the slot before network work, including simultaneous requests.
   const reservation=await db.prepare('INSERT INTO missions (id,owner,business_id,business_name,status,report,created_at) SELECT ?,?,?,?,?,?,? WHERE (SELECT count(*) FROM missions WHERE owner=? AND created_at>?)<4').bind(id,user.userId,business.id,business.name,'pending','{}',createdAt,user.userId,minuteAgo).run();

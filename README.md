@@ -32,7 +32,7 @@ npm run lint
 npm run build
 ```
 
-I test usano fixture locali per analisi, prototipi, coda, geometria e percorsi. GitHub Actions esegue test, TypeScript, lint e build su Node 24. Le verifiche browser sono descritte in `docs/verification-v7.md`, `docs/verification-v8.md`, `docs/verification-v9.md` e `docs/verification-v10.md`.
+I test usano fixture locali per analisi, prototipi, coda, geometria e percorsi. I test delle API (`tests/api-routes.test.mjs`) eseguono i gestori reali di preferite, missioni e verifica su un database SQLite in memoria creato dalle migrazioni, con identità simulata: coprono autenticazione, proprietà dei dati, limite di quattro analisi al minuto (anche simultanee), download protetti e verifica. GitHub Actions esegue test, TypeScript, lint e build su Node 24. Le verifiche browser sono descritte in `docs/verification-v7.md`, `docs/verification-v8.md`, `docs/verification-v9.md` e `docs/verification-v10.md`.
 
 ## Navigazione e strumenti della versione 10
 
